@@ -33,6 +33,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.OCPP_SECRET_ACCESSKEY_ID }}
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+          IMAGE_TAG: ${{ secrets.IMAGE_TAG }}
         run: |
           ssh -i private_key.pem -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST bash -s <<EOF
             # Login ECR
@@ -43,8 +44,8 @@ jobs:
               docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com
 
             # Pull & run container
-            docker pull $AWS_ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/ptr/ocpp20:latest
+            docker pull $AWS_ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/ptr/ocpp20:$IMAGE_TAG
             docker stop $CONTAINER_NAME || true
             docker rm $CONTAINER_NAME || true
-            docker run -d -p 8081:8081 --name $CONTAINER_NAME $AWS_ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/ptr/ocpp20:latest
+            docker run -d -p 8081:8081 --name $CONTAINER_NAME $AWS_ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/ptr/ocpp20:$IMAGE_TAG
           EOF
